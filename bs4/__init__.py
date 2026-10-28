@@ -129,6 +129,8 @@ from bs4._warnings import (
     XMLParsedAsHTMLWarning,
 )
 
+from bs4.replacer import SoupReplacer
+
 
 class BeautifulSoup(Tag):
     """A data structure representing a parsed HTML or XML document.
@@ -206,6 +208,8 @@ class BeautifulSoup(Tag):
     #: could not be represented in Unicode.
     contains_replacement_characters: bool
 
+    replacer: Optional[SoupReplacer] 
+
     def __init__(
         self,
         markup: _IncomingMarkup = "",
@@ -215,6 +219,7 @@ class BeautifulSoup(Tag):
         from_encoding: Optional[_Encoding] = None,
         exclude_encodings: Optional[_Encodings] = None,
         element_classes: Optional[Dict[Type[PageElement], Type[PageElement]]] = None,
+        replacer: Optional[SoupReplacer] = None,
         **kwargs: Any,
     ):
         """Constructor.
@@ -435,6 +440,7 @@ class BeautifulSoup(Tag):
         self.known_xml = self.is_xml
         self._namespaces = dict()
         self.parse_only = parse_only
+        self.replacer = replacer
 
         if hasattr(markup, "read"):  # It's a file-type object.
             markup = markup.read()
@@ -488,6 +494,8 @@ class BeautifulSoup(Tag):
         # reference to this object.
         self.markup = None
         self.builder.soup = None
+
+        
 
     def copy_self(self) -> "BeautifulSoup":
         """Create a new BeautifulSoup object with the same TreeBuilder,
@@ -804,6 +812,9 @@ class BeautifulSoup(Tag):
         # print("Pop", tag.name)
         if self.tagStack:
             self.currentTag = self.tagStack[-1]
+        if self.replacer is not None and tag.name == self.replacer.og_tag:
+            tag.name = self.replacer.alt_tag
+            
         return self.currentTag
 
     def pushTag(self, tag: Tag) -> None:
