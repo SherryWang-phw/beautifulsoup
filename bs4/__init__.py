@@ -812,8 +812,8 @@ class BeautifulSoup(Tag):
         # print("Pop", tag.name)
         if self.tagStack:
             self.currentTag = self.tagStack[-1]
-        if self.replacer is not None and tag.name == self.replacer.og_tag:
-            tag.name = self.replacer.alt_tag
+        if self.replacer is not None :
+            self.replacer.transform(tag)
             
         return self.currentTag
 
