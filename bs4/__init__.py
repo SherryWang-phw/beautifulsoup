@@ -495,7 +495,8 @@ class BeautifulSoup(Tag):
         self.markup = None
         self.builder.soup = None
 
-        
+    def __iter__(self) -> Iterator[PageElement]:
+        return self.descendants 
 
     def copy_self(self) -> "BeautifulSoup":
         """Create a new BeautifulSoup object with the same TreeBuilder,
